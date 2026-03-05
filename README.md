@@ -12,8 +12,8 @@ Fornecer uma ferramenta capaz de prever quais clientes estão propensos a abando
 
 ## Funcionalidades
 * **Geração automática de dados:** Criação de um CSV realista para testes.
-* **Análise de variáveis:** Identificação de que o baixo uso da plataforma é o maior vilão da retenção.
-* **Ferramenta de predição:** Interface de código que permite testar clientes individualmente para tomada de decisão imediata.
+* **Análise de variáveis:** Identificação de que o baixo uso da plataforma é o maior opositor da retenção.
+* **Ferramenta de predição:** Interface de código que permite testar clientes individualmente para a tomada de decisão imediata.
 
 ## Como instalar
 1. Clone o repositório.

@@ -4,7 +4,7 @@
 
 - [Objetivo](#objetivo)
 - [Estrutura do Projeto](#estrutura-do-projeto)
-- [Tecnologias Utilizadas](#tecnologias-utilizadas)
+- [O que foi utilizado? ](#o-que-foi-utilizado)
 - [Passo a Passo da Análise](#passo-a-passo-da-análise)
   - [1. Geração da Base de Dados](#1-geração-da-base-de-dados)
   - [2. Análise Exploratória](#2-análise-exploratória)
@@ -22,7 +22,7 @@
 
 ## Objetivo
 
-Construir um simulador completo de churn (cancelamento) para uma empresa SaaS fictícia, passando por todas as etapas de um projeto de ciência de dados: geração dos dados, exploração, modelagem preditiva com Random Forest e análise do impacto financeiro dos cancelamentos.
+Construir um simulador completo de churn (cancelamento) para dados amostrais de uma empresa, passando por todas as etapas de um projeto de ciência de dados: geração dos dados, exploração, modelagem preditiva com Random Forest e análise do impacto financeiro dos cancelamentos.
 
 ---
 
@@ -40,7 +40,7 @@ simulador-churn/
 
 ---
 
-## Tecnologias Utilizadas
+## O que foi utilizado? 
 
 | Biblioteca | Uso |
 |---|---|
@@ -88,7 +88,14 @@ Antes de treinar qualquer modelo, os dados foram explorados para entender padrõ
 
 **Gráficos gerados (3 subplots lado a lado):**
 
-> 📌 **Inserir aqui:** `graficos/01_analise_exploratoria.png`
+<img width="800" src="https://github.com/user-attachments/assets/8a4bea88-edd6-4e62-b43d-19f0dcc17e68" alt="Matriz de Confusão e Importância das Variáveis" />
+
+<img width="800" src="https://github.com/user-attachments/assets/c4a6e588-5e26-488d-8180-8ca332e5cd70" alt="Dashboard de Métricas de Marketing" />
+
+<img width="800" src="https://github.com/user-attachments/assets/e3b8f1ce-38c7-436b-9370-a31ec934a79f" alt="Análise de Funil de Conversão" />
+
+
+
 
 | Subplot | O que mostra | Como interpretar |
 |---|---|---|
@@ -149,7 +156,8 @@ O modelo foi avaliado no conjunto de teste (2.000 registros).
 
 **Gráficos gerados (2 subplots lado a lado):**
 
-> 📌 **Inserir aqui:** `graficos/02_matriz_importancia.png`
+<img width="800" src="https://github.com/user-attachments/assets/48ab2cd1-c1d0-4e4d-802b-d08cfc81655f" alt="Dashboard de Performance de Vendas e Marketing" />
+
 
 | Subplot | O que mostra | Como interpretar |
 |---|---|---|
@@ -170,7 +178,7 @@ Cada cliente do teste recebe uma probabilidade contínua de churn (0% a 100%), n
 
 **Gráfico gerado:**
 
-> 📌 **Inserir aqui:** `graficos/03_distribuicao_probabilidades.png`
+<img width="800" src="https://github.com/user-attachments/assets/3354e6ef-4df4-4e91-908b-f08c5d72854a" alt="Dashboard de métricas complementares" />
 
 | Elemento | O que mostra |
 |---|---|

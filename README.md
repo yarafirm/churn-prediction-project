@@ -90,11 +90,6 @@ Antes de treinar qualquer modelo, os dados foram explorados para entender padrõ
 
 <img width="800" src="https://github.com/user-attachments/assets/8a4bea88-edd6-4e62-b43d-19f0dcc17e68" alt="Matriz de Confusão e Importância das Variáveis" />
 
-<img width="800" src="https://github.com/user-attachments/assets/c4a6e588-5e26-488d-8180-8ca332e5cd70" alt="Dashboard de Métricas de Marketing" />
-
-<img width="800" src="https://github.com/user-attachments/assets/e3b8f1ce-38c7-436b-9370-a31ec934a79f" alt="Análise de Funil de Conversão" />
-
-
 
 
 | Subplot | O que mostra | Como interpretar |

@@ -1,119 +1,117 @@
-# Simulador de Churn — Análise de Cancelamento de Clientes SaaS
+# Churn Simulator: Customer Cancellation Analysis for a SaaS Business
 
-## Sumário
+*English version. A versão em português está em [README.pt-BR.md](README.pt-BR.md).*
 
-- [Objetivo](#objetivo)
-- [Estrutura do Projeto](#estrutura-do-projeto)
-- [O que foi utilizado? ](#o-que-foi-utilizado)
-- [Passo a Passo da Análise](#passo-a-passo-da-análise)
-  - [1. Geração da Base de Dados](#1-geração-da-base-de-dados)
-  - [2. Análise Exploratória](#2-análise-exploratória)
-  - [3. Preparação dos Dados](#3-preparação-dos-dados)
-  - [4. Treinamento do Modelo](#4-treinamento-do-modelo)
-  - [5. Avaliação de Performance](#5-avaliação-de-performance)
-  - [6. Distribuição das Probabilidades](#6-distribuição-das-probabilidades)
-  - [7. Análise de Impacto Financeiro](#7-análise-de-impacto-financeiro)
-  - [8. Preditor Individual](#8-preditor-individual)
-- [Resultados Obtidos](#resultados-obtidos)
-- [Conclusões](#conclusões)
-- [Como Executar](#como-executar)
+## Contents
 
----
-
-## Objetivo
-
-Construir um simulador completo de churn (cancelamento) para dados amostrais de uma empresa, passando por todas as etapas de um projeto de ciência de dados: geração dos dados, exploração, modelagem preditiva com Random Forest e análise do impacto financeiro dos cancelamentos.
+- [Goal](#goal)
+- [Project Structure](#project-structure)
+- [Libraries](#libraries)
+- [Step by Step](#step-by-step)
+  - [1. Data Generation](#1-data-generation)
+  - [2. Exploratory Analysis](#2-exploratory-analysis)
+  - [3. Data Preparation](#3-data-preparation)
+  - [4. Model Training](#4-model-training)
+  - [5. Performance Evaluation](#5-performance-evaluation)
+  - [6. Predicted Probability Distribution](#6-predicted-probability-distribution)
+  - [7. Financial Impact](#7-financial-impact)
+  - [8. Individual Predictor](#8-individual-predictor)
+- [Results](#results)
+- [Conclusions](#conclusions)
+- [How to Run](#how-to-run)
 
 ---
 
-## Estrutura do Projeto
+## Goal
+
+Build an end-to-end churn simulator on sample data for a subscription business, covering every stage of a data science project: data generation, exploration, predictive modeling with a Random Forest classifier and an estimate of the revenue at risk from the customers most likely to cancel.
+
+---
+
+## Project Structure
 
 ```
-simulador-churn/
-├── simulador_churn.py          # Código principal
-├── README.md                   # Este documento
-└── graficos/                   # Pasta para salvar os gráficos gerados
-    ├── 01_analise_exploratoria.png
-    ├── 02_matriz_importancia.png
-    ├── 03_distribuicao_probabilidades.png
+churn-prediction-project/
+├── README.md                         # This document (English)
+├── README.pt-BR.md                   # Portuguese version
+└── data/
+    ├── simulador_churn_Version3.py   # Main script: generation, EDA, model, financial impact
+    ├── saas_customer_churn.csv       # Sample of the synthetic customer base
+    └── processed/                    # Folder for generated charts
 ```
 
 ---
 
-## O que foi utilizado? 
+## Libraries
 
-| Biblioteca | Uso |
+| Library | Use |
 |---|---|
-| pandas | Manipulação de dados |
-| numpy | Operações numéricas |
-| matplotlib | Gráficos |
-| seaborn | Visualizações estatísticas |
-| scikit-learn | Modelagem preditiva (Random Forest) |
+| pandas | Data manipulation |
+| numpy | Numerical operations |
+| matplotlib | Charts |
+| seaborn | Statistical visualizations |
+| scikit-learn | Predictive modeling (Random Forest) |
 
 ---
 
-## Passo a Passo da Análise
+## Step by Step
 
-### 1. Geração da Base de Dados
+### 1. Data Generation
 
-Foram gerados **10.000 registros** simulando clientes de uma plataforma SaaS com três planos.
+The script generates **10,000 records** simulating customers of a SaaS platform with three plans.
 
-**Variáveis criadas:**
+**Variables:**
 
-| Variável | Descrição |
+| Variable | Description |
 |---|---|
-| `ID` | Identificador único do cliente |
-| `Plano` | Basic, Pro ou Enterprise |
-| `Valor_Mensal` | R$ 29.90 / R$ 79.90 / R$ 249.90 |
-| `Logins` | Quantidade de logins no último mês (0 a 30) |
-| `Tickets` | Chamados de suporte abertos (0 a 10) |
-| `Meses_Permanencia` | Tempo como cliente (1 a 24 meses) |
-| `Churn` | 0 = ficou, 1 = cancelou |
-| `LTV` | Lifetime Value = Meses × Valor Mensal |
+| `ID` | Unique customer identifier |
+| `Plano` | Plan: Basic, Pro or Enterprise |
+| `Valor_Mensal` | Monthly fee: R$ 29.90 / R$ 79.90 / R$ 249.90 |
+| `Logins` | Logins in the last month (0 to 30) |
+| `Tickets` | Support tickets opened (0 to 10) |
+| `Meses_Permanencia` | Tenure in months (1 to 24) |
+| `Churn` | 0 = stayed, 1 = cancelled |
+| `LTV` | Lifetime value = tenure × monthly fee |
 
-**Regras de negócio para o churn:**
+**Business rules behind churn:**
 
-- Probabilidade base: **15%**
-- Menos de 5 logins: **+35%** (cliente não usa o produto)
-- Mais de 6 tickets: **+25%** (cliente insatisfeito)
-- 10% dos casos têm resultado aleatório (simula imprevisibilidade real)
+- Base probability: **15%**
+- Fewer than 5 logins: **+35%** (the customer does not use the product)
+- More than 6 tickets: **+25%** (the customer is unhappy)
+- 10% of the cases get a random outcome, to mimic the unpredictability of real data
 
 ---
 
-### 2. Análise Exploratória
+### 2. Exploratory Analysis
 
-Antes de treinar qualquer modelo, os dados foram explorados para entender padrões.
+Before training any model, the data was explored to understand its patterns.
 
-**Tabela gerada:** estatísticas agrupadas por plano (quantidade de clientes, churn médio, logins médio, tickets médio e LTV médio).
+**Table:** statistics grouped by plan (number of customers, average churn, average logins, average tickets and average LTV).
 
-**Gráficos gerados (3 subplots lado a lado):**
+**Charts (three subplots side by side):**
 
-<img width="800" src="https://github.com/user-attachments/assets/8a4bea88-edd6-4e62-b43d-19f0dcc17e68" alt="Matriz de Confusão e Importância das Variáveis" />
+<img width="800" src="https://github.com/user-attachments/assets/8a4bea88-edd6-4e62-b43d-19f0dcc17e68" alt="Exploratory analysis: logins and tickets by churn status, churn rate by plan" />
 
-
-
-| Subplot | O que mostra | Como interpretar |
+| Subplot | What it shows | How to read it |
 |---|---|---|
-| Esquerdo | Boxplot de Logins por Churn | Clientes que saíram têm mediana de logins muito mais baixa |
-| Centro | Boxplot de Tickets por Churn | Clientes que saíram abriram mais chamados de suporte |
-| Direito | Taxa de churn por plano | Compara a proporção de cancelamento entre Basic, Pro e Enterprise |
+| Left | Boxplot of logins by churn status | Customers who left have a much lower median of logins |
+| Center | Boxplot of tickets by churn status | Customers who left opened more support tickets |
+| Right | Churn rate by plan | Compares the cancellation share across Basic, Pro and Enterprise |
 
-**O que se observa:**
-- Clientes com poucos logins cancelam mais — o desuso é o principal fator de risco
-- Muitos tickets indicam atrito com o produto
-- A taxa de churn é semelhante entre os planos porque o plano sozinho não entra na regra de probabilidade, apenas o comportamento de uso
+**What stands out:**
+- Customers with few logins cancel more often, so disuse is the main risk factor
+- Many tickets point to friction with the product
+- Churn rate is similar across plans because the plan itself is not part of the probability rule, only usage behavior is
 
 ---
 
-### 3. Preparação dos Dados
+### 3. Data Preparation
 
-Os dados foram preparados para alimentar o modelo:
+- The categorical variable `Plano` was encoded as a numeric code (`Plano_Cod`)
+- The dataset was split into **80% training** and **20% test**
+- The split was **stratified** (`stratify=y`) to keep the same churn proportion in both sets
 
-- A variável categórica `Plano` foi convertida para código numérico (`Plano_Cod`)
-- O dataset foi dividido em **80% treino** e **20% teste**
-- Foi aplicada **estratificação** (`stratify=y`) para manter a mesma proporção de churn no treino e no teste
-
-**Features utilizadas:**
+**Features used:**
 
 ```
 Valor_Mensal | Logins | Tickets | Meses_Permanencia | Plano_Cod
@@ -121,149 +119,147 @@ Valor_Mensal | Logins | Tickets | Meses_Permanencia | Plano_Cod
 
 ---
 
-### 4. Treinamento do Modelo
+### 4. Model Training
 
-Foi treinado um **Random Forest Classifier** com os seguintes hiperparâmetros:
+A **Random Forest Classifier** was trained with the following hyperparameters:
 
-| Parâmetro | Valor | Motivo |
+| Parameter | Value | Reason |
 |---|---|---|
-| `n_estimators` | 200 | Mais árvores para estabilizar as previsões |
-| `max_depth` | 10 | Limita a profundidade para evitar overfitting |
-| `min_samples_split` | 20 | Exige no mínimo 20 amostras para dividir um nó |
-| `min_samples_leaf` | 10 | Cada folha precisa ter ao menos 10 amostras |
+| `n_estimators` | 200 | More trees to stabilize the predictions |
+| `max_depth` | 10 | Limits depth to avoid overfitting |
+| `min_samples_split` | 20 | Requires at least 20 samples to split a node |
+| `min_samples_leaf` | 10 | Each leaf must hold at least 10 samples |
 
-Esses parâmetros foram escolhidos para equilibrar capacidade preditiva com generalização — o modelo não decora os dados de treino.
+These values balance predictive power and generalization, so the model does not memorize the training data.
 
 ---
 
-### 5. Avaliação de Performance
+### 5. Performance Evaluation
 
-O modelo foi avaliado no conjunto de teste (2.000 registros).
+The model was evaluated on the test set (2,000 records).
 
-**Métricas geradas:**
+**Metrics:**
 
-| Métrica | O que significa |
+| Metric | Meaning |
 |---|---|
-| Precision | Dos que o modelo disse que iam sair, quantos realmente saíram |
-| Recall | Dos que realmente saíram, quantos o modelo conseguiu identificar |
-| F1-Score | Média harmônica entre precision e recall |
-| Accuracy | Taxa geral de acerto |
+| Precision | Of the customers the model flagged as leaving, how many actually left |
+| Recall | Of the customers who actually left, how many the model caught |
+| F1-Score | Harmonic mean of precision and recall |
+| Accuracy | Overall hit rate |
 
-**Gráficos gerados (2 subplots lado a lado):**
+**Charts (two subplots side by side):**
 
-<img width="800" src="https://github.com/user-attachments/assets/48ab2cd1-c1d0-4e4d-802b-d08cfc81655f" alt="Dashboard de Performance de Vendas e Marketing" />
+<img width="800" src="https://github.com/user-attachments/assets/48ab2cd1-c1d0-4e4d-802b-d08cfc81655f" alt="Confusion matrix and feature importance" />
 
-
-| Subplot | O que mostra | Como interpretar |
+| Subplot | What it shows | How to read it |
 |---|---|---|
-| Esquerdo | **Matriz de Confusão** | Quadrante superior-esquerdo = acertou quem ficou. Inferior-direito = acertou quem saiu. Os outros dois quadrantes são erros |
-| Direito | **Importância das Variáveis** | Ranking de quais features mais contribuíram para as previsões do modelo |
+| Left | **Confusion matrix** | Top-left quadrant = correctly predicted stays. Bottom-right = correctly predicted cancellations. The other two quadrants are errors |
+| Right | **Feature importance** | Ranking of the features that contributed most to the model's predictions |
 
-**O que se observa:**
-- `Logins` é a variável mais importante — faz sentido, já que a principal regra de churn é o desuso
-- `Tickets` aparece como segundo fator mais relevante
-- `Meses_Permanencia` e `Valor_Mensal` têm importância menor
-- `Plano_Cod` tem pouca influência direta (o plano por si só não determina churn)
+**What stands out:**
+- `Logins` is the most important variable, which makes sense since the main churn rule is disuse
+- `Tickets` comes second
+- `Meses_Permanencia` and `Valor_Mensal` matter less
+- `Plano_Cod` has little direct influence (the plan alone does not drive churn)
 
 ---
 
-### 6. Distribuição das Probabilidades
+### 6. Predicted Probability Distribution
 
-Cada cliente do teste recebe uma probabilidade contínua de churn (0% a 100%), não apenas um rótulo binário.
+Each test customer receives a continuous churn probability (0% to 100%) rather than only a binary label.
 
-**Gráfico gerado:**
+<img width="800" src="https://github.com/user-attachments/assets/3354e6ef-4df4-4e91-908b-f08c5d72854a" alt="Distribution of predicted churn probabilities" />
 
-<img width="800" src="https://github.com/user-attachments/assets/3354e6ef-4df4-4e91-908b-f08c5d72854a" alt="Dashboard de métricas complementares" />
-
-| Elemento | O que mostra |
+| Element | What it shows |
 |---|---|
-| Barras azuis | Distribuição de probabilidade dos clientes que **ficaram** |
-| Barras corais | Distribuição de probabilidade dos clientes que **saíram** |
-| Linha tracejada | Limiar de decisão (0.5) |
+| Blue bars | Probability distribution of customers who **stayed** |
+| Coral bars | Probability distribution of customers who **left** |
+| Dashed line | Decision threshold (0.5) |
 
-**O que se observa:**
-- Quanto mais separadas as duas distribuições, melhor o modelo discrimina entre as classes
-- Clientes que ficaram tendem a ter probabilidades baixas (concentrados à esquerda)
-- Clientes que saíram tendem a ter probabilidades altas (concentrados à direita)
-- A zona de sobreposição no meio é onde o modelo tem mais dificuldade de decisão
+**What stands out:**
+- The further apart the two distributions, the better the model separates the classes
+- Customers who stayed concentrate at low probabilities (left side)
+- Customers who left concentrate at high probabilities (right side)
+- The overlap in the middle is where the model struggles most
 
 ---
 
-### 7. Análise de Impacto Financeiro
+### 7. Financial Impact
 
-Além da previsão, foi calculado o impacto financeiro do churn.
+Beyond prediction, the script estimates the financial impact of churn.
 
-**Definição de alto risco:** probabilidade de churn ≥ 60%.
+**High-risk definition:** churn probability ≥ 60%.
 
-**Métricas calculadas:**
+**Metrics:**
 
-| Métrica | Descrição |
+| Metric | Description |
 |---|---|
-| Total de clientes de alto risco | Quantos clientes têm probabilidade ≥ 60% |
-| % da base em risco | Proporção do total |
-| LTV total em risco | Soma do Lifetime Value dos clientes de alto risco |
-| LTV médio em risco | Média do LTV desse grupo |
+| High-risk customers | How many customers have probability ≥ 60% |
+| % of the base at risk | Share of the total |
+| Total LTV at risk | Sum of the lifetime value of high-risk customers |
+| Average LTV at risk | Average LTV within that group |
 
-**Detalhamento por plano:** tabela mostrando quantidade de clientes de alto risco, probabilidade média e LTV total em risco para cada plano (Basic, Pro, Enterprise).
+**Breakdown by plan:** a table with the number of high-risk customers, their average probability and the total LTV at risk for each plan (Basic, Pro, Enterprise).
 
-Essa análise permite estimar quanto dinheiro a empresa perderia se não agisse sobre os clientes identificados como alto risco.
+This gives an estimate of how much revenue the company would lose if it took no action on the customers flagged as high risk.
 
 ---
 
-### 8. Preditor Individual
+### 8. Individual Predictor
 
-Uma função permite testar perfis específicos de clientes e obter:
+A function scores specific customer profiles and returns:
 
-- Probabilidade exata de churn
-- Classificação de risco (baixo / moderado / alto)
-- LTV estimado
+- The exact churn probability
+- A risk label (low / moderate / high)
+- The estimated LTV
 
-**Exemplos testados:**
+**Profiles tested:**
 
-| Perfil | Plano | Logins | Tickets | Meses | Risco Esperado |
+| Profile | Plan | Logins | Tickets | Months | Expected risk |
 |---|---|---|---|---|---|
-| Cliente desengajado | Pro | 2 | 9 | 3 | Alto |
-| Cliente fiel | Enterprise | 22 | 1 | 18 | Baixo |
-| Cliente intermediário | Basic | 8 | 5 | 6 | Moderado |
+| Disengaged customer | Pro | 2 | 9 | 3 | High |
+| Loyal customer | Enterprise | 22 | 1 | 18 | Low |
+| In-between customer | Basic | 8 | 5 | 6 | Moderate |
 
 ---
 
-## Resultados Obtidos
+## Results
 
-### Performance do Modelo
+### Model Performance
 
-O modelo alcançou boa capacidade de separação entre clientes que ficam e clientes que saem, considerando que os dados contêm 10% de ruído proposital.
+The model separates customers who stay from customers who leave well, considering that 10% of the data carries deliberate noise.
 
-### Principais Fatores de Churn
+### Main Churn Drivers
 
-1. **Logins** — fator dominante. Clientes que não usam o produto cancelam
-2. **Tickets** — segundo fator. Muitas reclamações indicam insatisfação
-3. **Permanência e valor** — influência menor na decisão de churn
-4. **Plano** — pouco relevante isoladamente
+1. **Logins**, the dominant factor. Customers who do not use the product cancel
+2. **Tickets**, the second factor. Many complaints signal dissatisfaction
+3. **Tenure and fee**, with a smaller influence on the churn decision
+4. **Plan**, with little relevance on its own
 
-### Impacto Financeiro
+### Financial Impact
 
-O grupo de alto risco (≥ 60% de probabilidade) concentra uma parcela significativa do LTV total da base, indicando que ações de retenção direcionadas a esse grupo teriam retorno elevado.
-
----
-
-## Conclusões
-
-- O desuso do produto é o sinal mais forte de cancelamento futuro. Monitorar a frequência de logins é a ação mais direta para identificar risco
-- O volume de chamados de suporte é o segundo indicador. Clientes que abrem muitos tickets precisam de atenção antes que decidam sair
-- O modelo consegue separar bem os perfis de risco mesmo com ruído nos dados, o que indica robustez
-- A análise financeira mostra que prever churn tem valor direto: permite priorizar ações de retenção nos clientes que representam maior perda potencial
+The high-risk group (≥ 60% probability) concentrates a significant share of the base's total LTV, so retention actions aimed at this group would have a high return.
 
 ---
 
-## Como Executar
+## Conclusions
+
+- Product disuse is the strongest signal of future cancellation. Monitoring login frequency is the most direct way to spot risk
+- Support ticket volume is the second indicator. Customers who open many tickets need attention before they decide to leave
+- The model separates risk profiles well even with noisy data, which indicates robustness
+- The financial analysis shows that predicting churn has direct value: it lets the company prioritize retention on the customers who represent the largest potential loss
+
+---
+
+## How to Run
 
 ```bash
-# Instalar dependências
+# Install dependencies
 pip install pandas numpy matplotlib seaborn scikit-learn
 
-# Executar
-python simulador_churn.py
+# Run
+cd data
+python simulador_churn_Version3.py
 ```
 
-Os gráficos serão exibidos durante a execução. Para salvá-los na pasta `graficos/`, adicione `plt.savefig("graficos/nome.png")` antes de cada `plt.show()` no código.
+Charts are displayed during execution. To save them to `data/processed/`, add `plt.savefig("processed/<name>.png")` before each `plt.show()` in the script.
